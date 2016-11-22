@@ -237,13 +237,15 @@
                         (utils/log :error (str  "Figwheel: Error loading file " cache-path))
                         (utils/log :error (.-stack e))
                         false))))))
-    
+
     :html (fn [request-url callback]
-            (dev-assert (string? request-url) (not (nil? callback)))  
+            (dev-assert (string? request-url) (not (nil? callback)))
             (let [deferred (loader/load (add-cache-buster request-url)
                                         #js { :cleanupWhenDone true })]
               (.addCallback deferred #(apply callback [true]))
               (.addErrback deferred #(apply callback [false]))))
+    :worker (fn [request-url callback]
+              (callback true))
     (fn [a b] (throw "Reload not defined for this platform"))))
 
 (defn reload-file [{:keys [request-url] :as file-msg} callback]
